@@ -1,8 +1,23 @@
+// 1. Importações (Removidas duplicatas)
 import { createUser } from './scripts/api/create.js';
-// Adicione ao app.js:
+import { renderUsers, findUserById } from './scripts/dom/render.js';
+import { deleteUser } from './scripts/api/delete.js';
+import { updateUser, patchUser } from './scripts/api/update.js';
+
+// 2. Referências do DOM
 const form = document.getElementById('create-user-form');
 const formError = document.getElementById('form-error');
+const formTitle = document.getElementById('form-title');
+const submitBtn = form.querySelector('button[type="submit"]');
+const cancelBtn = document.getElementById('cancel-edit');
+const usersSection = document.getElementById('users');
 
+// 3. Estado
+let editingId = null;
+let originalUser = null;
+const apiUrl = 'https://api.exemplo.com/users'; // Defina sua URL base aqui
+
+// 4. Funções de UI
 function showError(message) {
     formError.textContent = message;
     formError.classList.remove('d-none');
@@ -13,9 +28,39 @@ function hideError() {
     formError.textContent = '';
 }
 
+function enterEditMode(user) {
+    editingId = user.id;
+    originalUser = { ...user };
+
+    document.getElementById('name').value = user.name;
+    document.getElementById('age').value = user.age;
+    document.getElementById('email').value = user.email;
+
+    formTitle.textContent = 'Edit User';
+    submitBtn.textContent = 'Update';
+    cancelBtn.style.display = '';
+    document.getElementById('name').focus();
+}
+
+function exitEditMode() {
+    editingId = null;
+    originalUser = null;
+    formTitle.textContent = 'Create User';
+    submitBtn.textContent = 'Create';
+    cancelBtn.style.display = 'none';
+    form.reset();
+}
+
+function getUserFromCard(button) {
+    const card = button.closest('.user-card');
+    return findUserById(Number(card.id));
+}
+
+// 5. Listeners
+cancelBtn.addEventListener('click', exitEditMode);
+
 form.addEventListener('submit', async (event) => {
     event.preventDefault();
-
     const name = document.getElementById('name').value;
     const age = document.getElementById('age').value;
     const email = document.getElementById('email').value;
@@ -23,11 +68,51 @@ form.addEventListener('submit', async (event) => {
     hideError();
 
     try {
-        await createUser(apiUrl, { name, age, email });
+        if (editingId !== null) {
+            // Lógica de Edição
+            const changed = {};
+            if (name !== originalUser.name) changed.name = name;
+            if (Number(age) !== originalUser.age) changed.age = age;
+            if (email !== originalUser.email) changed.email = email;
 
-        form.reset();
+            if (Object.keys(changed).length === 0) {
+                exitEditMode();
+                return;
+            }
+
+            const allChanged = Object.keys(changed).length === 3;
+            allChanged ? await updateUser(apiUrl, editingId, { name, age, email }) 
+                       : await patchUser(apiUrl, editingId, changed);
+            
+            exitEditMode();
+        } else {
+            // Lógica de Criação
+            await createUser(apiUrl, { name, age, email });
+            form.reset();
+        }
         renderUsers(apiUrl);
     } catch (error) {
         showError(error.message);
+    }
+});
+
+usersSection.addEventListener('click', async (event) => {
+    const { target } = event;
+
+    if (target.dataset.action === 'edit') {
+        enterEditMode(getUserFromCard(target));
+    }
+
+    if (target.dataset.action === 'delete') {
+        const user = getUserFromCard(target);
+        if (!confirm('Are you sure you want to delete this user?')) return;
+
+        try {
+            await deleteUser(apiUrl, user.id);
+            if (editingId === user.id) exitEditMode();
+            renderUsers(apiUrl);
+        } catch (error) {
+            showError(error.message);
+        }
     }
 });
