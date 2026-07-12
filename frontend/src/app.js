@@ -15,7 +15,7 @@ const usersSection = document.getElementById('users');
 // 3. Estado
 let editingId = null;
 let originalUser = null;
-const apiUrl = 'http://localhost:8000/api/users'; // Defina sua URL base aqui
+const apiUrl = 'http://192.168.3.123:8000/api/users'; // Defina sua URL base aqui
 
 // 4. Funções de UI
 function showError(message) {
