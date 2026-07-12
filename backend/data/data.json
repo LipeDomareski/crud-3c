@@ -1,0 +1,29 @@
+{
+    "users": [
+        {
+            "id": 1,
+            "name": "Felipe",
+            "email": "felipe@email.com",
+            "age": 19
+        },
+        {
+            "id": 2,
+            "name": "lipelindo",
+            "email": "domalipe@gmail.com",
+            "age": 14
+        },
+        {
+            "name": "MARIANA",
+            "age": 12,
+            "email": "domareskifelipe44@gmail.com",
+            "id": 1
+        },
+        {
+            "name": "lipe",
+            "age": 12,
+            "email": "domareskifelipe44@gmail.com",
+            "id": 2
+        }
+    ],
+    "nextId": 3
+}

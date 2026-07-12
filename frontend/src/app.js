@@ -1,8 +1,8 @@
 // 1. Importações (Removidas duplicatas)
-import { createUser } from './scripts/api/create.js';
-import { renderUsers, findUserById } from './scripts/dom/render.js';
-import { deleteUser } from './scripts/api/delete.js';
-import { updateUser, patchUser } from './scripts/api/update.js';
+import { createUser } from '../scripts/api/create.js';
+import { renderUsers, findUserById } from '../scripts/dom/render.js';
+import { deleteUser } from '../scripts/api/delete.js';
+import { updateUser, patchUser } from '../scripts/api/update.js';
 
 // 2. Referências do DOM
 const form = document.getElementById('create-user-form');
@@ -15,7 +15,7 @@ const usersSection = document.getElementById('users');
 // 3. Estado
 let editingId = null;
 let originalUser = null;
-const apiUrl = 'https://api.exemplo.com/users'; // Defina sua URL base aqui
+const apiUrl = 'http://localhost:8000/api/users'; // Defina sua URL base aqui
 
 // 4. Funções de UI
 function showError(message) {

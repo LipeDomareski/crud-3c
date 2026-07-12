@@ -1,0 +1,18 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: crud-frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+    container_name: crud-backend
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
